@@ -5,10 +5,6 @@ import (
 	"hexagonal/domain/shop"
 )
 
-type InputGetShop struct {
-	ListShopID []int
-}
-
 type ShopResponse struct {
 	ShopID   int64   `json:"shop_id"`
 	ShopURL  string  `json:"shop_url"`
@@ -18,14 +14,14 @@ type ShopResponse struct {
 	Status   int32   `json:"status"`
 }
 
-func (repo *Repositories) GetShop(i InputGetShop) shop.Shop {
+func (repo *Repositories) GetShop(i shop.InputGetShop) (shop.ListShop, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp ShopResponse
 
-	return resp.BuildToShop()
+	return resp.BuildToShop(), nil
 }
 
-func (r *ShopResponse) BuildToShop() shop.Shop {
-	return shop.Shop{}
+func (r *ShopResponse) BuildToShop() shop.ListShop {
+	return shop.ListShop{}
 }

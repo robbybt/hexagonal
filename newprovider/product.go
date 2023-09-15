@@ -5,12 +5,6 @@ import (
 	"hexagonal/domain/product"
 )
 
-// TODO: ASK
-
-type InputGetProductATC struct {
-	ListProductID []int
-}
-
 type TomeResponse struct {
 	ProductName     string `json:"json1"`
 	ProductAlias    string `json:"json2"`
@@ -23,14 +17,14 @@ type TomeResponse struct {
 	ProductPriceFmt string `json:"json"`
 }
 
-func (r *TomeResponse) BuildToProductDataATC() product.ProductDataATC {
-	return product.ProductDataATC{}
+func (r *TomeResponse) BuildToProductDataATC() product.ListProductATC {
+	return product.ListProductATC{}
 }
 
-func (repo *Repositories) GetProductATC(i InputGetProductATC) product.ProductDataATC {
+func (repo *Repositories) GetProductATC(i product.InputGetProductATC) (product.ListProductATC, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp TomeResponse
 
-	return resp.BuildToProductDataATC()
+	return resp.BuildToProductDataATC(), nil
 }

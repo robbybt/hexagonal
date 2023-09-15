@@ -3,18 +3,31 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"hexagonal/domain/campaign"
+	"hexagonal/domain/ims"
 	"hexagonal/domain/product"
+	"hexagonal/domain/shop"
+	"hexagonal/domain/warehouse"
 	"hexagonal/lib/ctxlib"
 	"hexagonal/lib/ratelimiter"
 	"hexagonal/newprovider"
+	"hexagonal/usecase/business"
 )
 
 type UseCases struct {
-	Repos newprovider.DomainRepository
+	Repos            newprovider.DomainRepository
+	Bmgm             business.BMGMUsecaseInterface
+	CheckRestriction business.CheckRestrictionUsecaseInterface
+	Owoc             business.OWOCUsecaseInterface
 }
 
 func NewUseCases(repos newprovider.DomainRepository) *UseCases {
-	return &UseCases{Repos: repos}
+	return &UseCases{
+		Repos:            repos,
+		Bmgm:             business.NewBMGMUseCases(repos),
+		CheckRestriction: business.NewCheckRestrictionUseCases(repos),
+		Owoc:             business.NewOWOCUseCases(repos),
+	}
 }
 
 type RequestFrontEndATC struct {
@@ -39,7 +52,7 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 		return resp, nil
 	}
 
-	listProdATC, err := uc.Repos.GetProductATC(newprovider.InputGetProductATC{
+	listProdATC, err := uc.Repos.GetProductATC(product.InputGetProductATC{
 		ListProductID: []int{req.productID},
 	})
 	if err != nil {
@@ -48,7 +61,7 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 	prod := listProdATC.List[0]
 	listProd := listProdATC.ListofProduct()
 
-	listShop, err := uc.Repos.GetShop(newprovider.InputGetShop{
+	listShop, err := uc.Repos.GetShop(shop.InputGetShop{
 		ListShopID: []int{req.shopID},
 	})
 	if err != nil {
@@ -57,7 +70,7 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 	mapShop := listShop.Map()
 	fmt.Println(mapShop)
 
-	ims, err := uc.Repos.GetNearestWarehouse(newprovider.InputGetNearestWarehouse{
+	imsData, err := uc.Repos.GetNearestWarehouse(ims.InputGetNearestWarehouse{
 		ListProductID: []int{req.productID},
 	})
 	if err != nil {
@@ -65,8 +78,8 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 	}
 
 	// GetCampaign need ims data so need to be called after get ims data
-	campaign, err := uc.Repos.GetCampaign(newprovider.InputGetCampaign{
-		WarehouseData: ims,
+	cmp, err := uc.Repos.GetCampaign(campaign.InputGetCampaign{
+		WarehouseData: imsData,
 		ListProductID: []int{req.productID},
 	})
 	if err != nil {
@@ -98,7 +111,7 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 
 	}
 
-	ListWarehouseData, err := uc.Repos.GetWarehouseData(newprovider.InputGetWarehouseData{
+	ListWarehouseData, err := uc.Repos.GetWarehouseData(warehouse.InputGetWarehouseData{
 		ListWarehouseID: listProdATC.ListWarehouse(),
 	})
 
@@ -106,12 +119,14 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 	// will skip it
 
 	if !isEnableMultiValidateRestriction() {
-		uc.CheckRestrictedCategoryProduct(ctx, listProd)
+		uc.CheckRestriction.CheckRestrictedCategoryProduct(ctx, listProd)
 	} else {
-		uc.CheckRestrictedCategoryProduct(ctx, listProd)
+		uc.CheckRestriction.CheckRestrictedCategoryProduct(ctx, listProd)
 	}
 
-	fmt.Println(listProd, listShop, campaign, ListWarehouseData)
+	// ValidateAddProductToCart
+
+	fmt.Println(listProd, listShop, cmp, ListWarehouseData)
 
 	return responseATC{}, nil
 }
@@ -136,6 +151,7 @@ func ValidateIsOneOfATCFromExternalSource(s string) bool {
 	return false
 }
 
+// get product data from variant ID
 func getNewProductDataVariant(req RequestFrontEndATC, i int64) product.ProductDataATC {
 	return product.ProductDataATC{}
 }

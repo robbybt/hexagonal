@@ -1,4 +1,4 @@
-package bmgm
+package business
 
 import (
 	"context"

@@ -1,12 +1,15 @@
-package context
+package ctxlib
 
 import (
 	"context"
 )
 
 type TraceSpan struct {
-	span        *tracing.Span
-	transaction *tracing.Transaction
+	a string
+}
+
+func (t *TraceSpan) Finish() {
+	return
 }
 
 func SetupContextTracerUsecase(ctx context.Context) (context.Context, *TraceSpan) {

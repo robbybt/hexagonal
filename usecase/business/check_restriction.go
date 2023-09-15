@@ -1,4 +1,4 @@
-package check_restriction
+package business
 
 import (
 	"context"

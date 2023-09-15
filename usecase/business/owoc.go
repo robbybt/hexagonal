@@ -1,4 +1,4 @@
-package owoc
+package business
 
 import (
 	"context"

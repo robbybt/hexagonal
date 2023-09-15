@@ -5,10 +5,6 @@ import (
 	"hexagonal/domain/ims"
 )
 
-type InputGetNearestWarehouse struct {
-	ListProductID []int
-}
-
 type ImsGRPC struct {
 	ProductID          int64   `protobuf:"varint,1,opt,name=productID,proto3" json:"productID,omitempty"`
 	Stock              int64   `protobuf:"varint,2,opt,name=stock,proto3" json:"stock,omitempty"`
@@ -23,7 +19,7 @@ type ImsResponse struct {
 	ImsGRPC
 }
 
-func (repo *Repositories) GetNearestWarehouse(i InputGetNearestWarehouse) (ims.ProductsWarehouseData, error) {
+func (repo *Repositories) GetNearestWarehouse(i ims.InputGetNearestWarehouse) (ims.ProductsWarehouseData, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp ImsResponse

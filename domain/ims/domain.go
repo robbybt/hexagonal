@@ -1,4 +1,4 @@
-package warehouse
+package ims
 
 type ProductsWarehouseData struct {
 	ProductsWarehouseData  map[int64]map[int64]ProductWarehouse
