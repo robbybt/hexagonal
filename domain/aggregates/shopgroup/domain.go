@@ -1,12 +1,12 @@
 package shopgroup
 
 import (
-	"hexagonal/domain/product"
-	"hexagonal/domain/shop"
+	"hexagonal/domain/entities/product"
+	"hexagonal/domain/entities/shop"
 )
 
 type CartGroup struct {
-	UserID    int64
+	UserID    int64 // user.User
 	ShopGroup ShopGroup
 }
 

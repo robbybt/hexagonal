@@ -2,7 +2,7 @@ package newprovider
 
 import (
 	"fmt"
-	"hexagonal/domain/tokonow"
+	"hexagonal/domain/entities/tokonow"
 )
 
 type InputGetTokonow struct {

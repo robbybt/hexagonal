@@ -1,14 +1,14 @@
 package newprovider
 
 import (
-	"hexagonal/domain/campaign"
-	"hexagonal/domain/cart"
-	"hexagonal/domain/ims"
-	"hexagonal/domain/product"
-	"hexagonal/domain/restriction"
-	"hexagonal/domain/shop"
-	"hexagonal/domain/tokonow"
-	"hexagonal/domain/warehouse"
+	"hexagonal/domain/entities/campaign"
+	"hexagonal/domain/entities/cart"
+	"hexagonal/domain/entities/ims"
+	"hexagonal/domain/entities/product"
+	"hexagonal/domain/entities/restriction"
+	"hexagonal/domain/entities/shop"
+	"hexagonal/domain/entities/tokonow"
+	"hexagonal/domain/entities/warehouse"
 )
 
 type DomainRepository interface {

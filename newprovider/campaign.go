@@ -2,7 +2,7 @@ package newprovider
 
 import (
 	"fmt"
-	"hexagonal/domain/campaign"
+	campaign2 "hexagonal/domain/entities/campaign"
 )
 
 type CampaignGRPC struct {
@@ -68,7 +68,7 @@ type CampaignResponse struct {
 	CampaignGRPC
 }
 
-func (repo *Repositories) GetCampaign(i campaign.InputGetCampaign) (campaign.CampaignData, error) {
+func (repo *Repositories) GetCampaign(i campaign2.InputGetCampaign) (campaign2.CampaignData, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp CampaignResponse
@@ -76,6 +76,6 @@ func (repo *Repositories) GetCampaign(i campaign.InputGetCampaign) (campaign.Cam
 	return resp.BuildToCampaignData(), nil
 }
 
-func (r *CampaignResponse) BuildToCampaignData() campaign.CampaignData {
-	return campaign.CampaignData{}
+func (r *CampaignResponse) BuildToCampaignData() campaign2.CampaignData {
+	return campaign2.CampaignData{}
 }

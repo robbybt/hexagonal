@@ -1,6 +1,8 @@
 package campaign
 
-import "hexagonal/domain/ims"
+import (
+	"hexagonal/domain/entities/ims"
+)
 
 type InputGetCampaign struct {
 	WarehouseData ims.ProductsWarehouseData

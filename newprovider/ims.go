@@ -2,7 +2,7 @@ package newprovider
 
 import (
 	"fmt"
-	"hexagonal/domain/ims"
+	ims2 "hexagonal/domain/entities/ims"
 )
 
 type ImsGRPC struct {
@@ -19,7 +19,7 @@ type ImsResponse struct {
 	ImsGRPC
 }
 
-func (repo *Repositories) GetNearestWarehouse(i ims.InputGetNearestWarehouse) (ims.ProductsWarehouseData, error) {
+func (repo *Repositories) GetNearestWarehouse(i ims2.InputGetNearestWarehouse) (ims2.ProductsWarehouseData, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp ImsResponse
@@ -27,6 +27,6 @@ func (repo *Repositories) GetNearestWarehouse(i ims.InputGetNearestWarehouse) (i
 	return resp.BuildToProductsWarehouseData(), nil
 }
 
-func (r *ImsResponse) BuildToProductsWarehouseData() ims.ProductsWarehouseData {
-	return ims.ProductsWarehouseData{}
+func (r *ImsResponse) BuildToProductsWarehouseData() ims2.ProductsWarehouseData {
+	return ims2.ProductsWarehouseData{}
 }

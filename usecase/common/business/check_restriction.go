@@ -2,9 +2,9 @@ package business
 
 import (
 	"context"
-	"hexagonal/domain/product"
-	"hexagonal/domain/restriction"
-	"hexagonal/domain/tokonow"
+	"hexagonal/domain/entities/product"
+	"hexagonal/domain/entities/restriction"
+	"hexagonal/domain/entities/tokonow"
 	"hexagonal/newprovider"
 )
 
@@ -13,6 +13,7 @@ type CheckRestrictionUsecaseInterface interface {
 	CheckRestrictedProductForShopFollower()
 	CheckRestrictedProductForLoyaltyDays()
 	MultiValidateRestriction()
+	CheckStatusFSLocationRestriction() string
 }
 
 type CheckRestrictionUseCases struct {
@@ -27,6 +28,7 @@ func NewCheckRestrictionUseCases(repos newprovider.DomainRepository) *CheckRestr
 	}
 }
 
+// CheckRestrictedCategoryProduct will return validation message according to category
 func (uc *CheckRestrictionUseCases) CheckRestrictedCategoryProduct(ctx context.Context, listProd []product.Product) (validationMessage string) {
 	var reqRestriction restriction.InputValidateRestrictionCategory
 	for _, p := range listProd {
@@ -44,21 +46,25 @@ func (uc *CheckRestrictionUseCases) CheckRestrictedCategoryProduct(ctx context.C
 	return
 }
 
+// CheckRestrictedProductForShopFollower will return validation message according to category
 func (uc *CheckRestrictionUseCases) CheckRestrictedProductForShopFollower() {
 	// TODO implement me
 	panic("implement me")
 }
 
+// CheckRestrictedProductForLoyaltyDays will return validation message according to category
 func (uc *CheckRestrictionUseCases) CheckRestrictedProductForLoyaltyDays() {
 	// TODO implement me
 	panic("implement me")
 }
 
+// MultiValidateRestriction will return validation message according to category
 func (uc *CheckRestrictionUseCases) MultiValidateRestriction() {
 	// TODO implement me
 	panic("implement me")
 }
 
-func CheckStatusFSLocationRestriction() string {
+// CheckStatusFSLocationRestriction will check all status location
+func (uc *CheckRestrictionUseCases) CheckStatusFSLocationRestriction() string {
 	return ""
 }

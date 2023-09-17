@@ -3,7 +3,7 @@ package newprovider
 import (
 	"context"
 	"fmt"
-	"hexagonal/domain/cart"
+	"hexagonal/domain/entities/cart"
 )
 
 type CartResponse struct {

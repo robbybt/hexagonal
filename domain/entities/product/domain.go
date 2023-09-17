@@ -1,15 +1,16 @@
 package product
 
-type ListProductATC struct {
-	List []ProductDataATC
-}
-
-type ProductDataATC struct {
-	Product
-
-	WarehouseData string
-	Volumetric    string
-}
+const (
+	ProductStateDeleted   = 0
+	ProductStateActive    = 1
+	ProductStateBest      = 2
+	ProductStateWareHouse = 3
+	ProductStateHidden    = 4
+	ProductStateActiveB2B = 5
+	ProductStateModerated = 6
+	ProductStatePending   = -1
+	ProductStateBanned    = -2
+)
 
 type Product struct {
 	ProductName      string
@@ -42,24 +43,4 @@ type productVariant struct {
 	IsParent   bool
 	IsVariant  bool
 	ChildrenID []int64
-}
-
-func (p *ListProductATC) MapofProductID() map[int64]Product {
-	return map[int64]Product{}
-}
-
-func (p *ListProductATC) ListofProduct() []Product {
-	return []Product{}
-}
-
-func (p *ListProductATC) ListWarehouse() []int {
-	return []int{}
-}
-
-func (p *Product) HaveVariant() bool {
-	return false
-}
-
-func (p *Product) GetMinimumOrder() int {
-	return 1
 }

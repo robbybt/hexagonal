@@ -1,7 +1,7 @@
 package restriction
 
 import (
-	"hexagonal/domain/tokonow"
+	"hexagonal/domain/entities/tokonow"
 )
 
 type ProdCategoryID int

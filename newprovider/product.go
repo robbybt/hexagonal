@@ -2,7 +2,7 @@ package newprovider
 
 import (
 	"fmt"
-	"hexagonal/domain/product"
+	product2 "hexagonal/domain/entities/product"
 )
 
 type TomeResponse struct {
@@ -17,11 +17,11 @@ type TomeResponse struct {
 	ProductPriceFmt string `json:"json"`
 }
 
-func (r *TomeResponse) BuildToProductDataATC() product.ListProductATC {
-	return product.ListProductATC{}
+func (r *TomeResponse) BuildToProductDataATC() product2.ListProductATC {
+	return product2.ListProductATC{}
 }
 
-func (repo *Repositories) GetProductATC(i product.InputGetProductATC) (product.ListProductATC, error) {
+func (repo *Repositories) GetProductATC(i product2.InputGetProductATC) (product2.ListProductATC, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp TomeResponse

@@ -2,7 +2,7 @@ package business
 
 import (
 	"context"
-	"hexagonal/domain/campaign"
+	"hexagonal/domain/entities/campaign"
 	"hexagonal/newprovider"
 )
 
@@ -18,6 +18,7 @@ func NewBMGMUseCases(repos newprovider.DomainRepository) *BMGMUseCases {
 	return &BMGMUseCases{CampaignRepos: repos}
 }
 
+// DoBMGM will get campaign and ...
 func (uc *BMGMUseCases) DoBMGM(ctx context.Context) error {
 	_, err := uc.CampaignRepos.GetCampaign(campaign.InputGetCampaign{})
 	return err

@@ -3,30 +3,30 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"hexagonal/domain/campaign"
-	"hexagonal/domain/ims"
-	"hexagonal/domain/product"
-	"hexagonal/domain/shop"
-	"hexagonal/domain/warehouse"
+	"hexagonal/domain/entities/campaign"
+	"hexagonal/domain/entities/ims"
+	"hexagonal/domain/entities/product"
+	"hexagonal/domain/entities/shop"
+	"hexagonal/domain/entities/warehouse"
 	"hexagonal/lib/ctxlib"
 	"hexagonal/lib/ratelimiter"
 	"hexagonal/newprovider"
-	"hexagonal/usecase/business"
+	business2 "hexagonal/usecase/common/business"
 )
 
 type UseCases struct {
 	Repos            newprovider.DomainRepository
-	Bmgm             business.BMGMUsecaseInterface
-	CheckRestriction business.CheckRestrictionUsecaseInterface
-	Owoc             business.OWOCUsecaseInterface
+	Bmgm             business2.BMGMUsecaseInterface
+	CheckRestriction business2.CheckRestrictionUsecaseInterface
+	Owoc             business2.OWOCUsecaseInterface
 }
 
 func NewUseCases(repos newprovider.DomainRepository) *UseCases {
 	return &UseCases{
 		Repos:            repos,
-		Bmgm:             business.NewBMGMUseCases(repos),
-		CheckRestriction: business.NewCheckRestrictionUseCases(repos),
-		Owoc:             business.NewOWOCUseCases(repos),
+		Bmgm:             business2.NewBMGMUseCases(repos),
+		CheckRestriction: business2.NewCheckRestrictionUseCases(repos),
+		Owoc:             business2.NewOWOCUseCases(repos),
 	}
 }
 
@@ -97,10 +97,11 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 	}
 
 	// validate whether users do ATC from wishlist, last seen, recommendation list, or etc..
-	if ValidateIsOneOfATCFromExternalSource("cd.ATCFromExternalSource") { // if product has variants; set a default variant for it
+	if ValidateIsOneOfATCFromExternalSource("cd.ATCFromExternalSource") {
+		// if product has variants; set a default variant for it
 		if prod.HaveVariant() {
 			// Change product data to product variant data
-			prod = getNewProductDataVariant(req, prod.Variant.ChildrenID[0])
+			prod = prod.GetProductVariant()
 		}
 		req.qty = prod.GetMinimumOrder()
 		/*
@@ -108,15 +109,11 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 				cd.ShopID = productData.ShopID
 			}
 		*/
-
 	}
 
 	ListWarehouseData, err := uc.Repos.GetWarehouseData(warehouse.InputGetWarehouseData{
 		ListWarehouseID: listProdATC.ListWarehouse(),
 	})
-
-	// Set IsAllowManageWarehouse if admin
-	// will skip it
 
 	if !isEnableMultiValidateRestriction() {
 		uc.CheckRestriction.CheckRestrictedCategoryProduct(ctx, listProd)
@@ -124,10 +121,7 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 		uc.CheckRestriction.CheckRestrictedCategoryProduct(ctx, listProd)
 	}
 
-	// ValidateAddProductToCart
-
 	fmt.Println(listProd, listShop, cmp, ListWarehouseData)
-
 	return responseATC{}, nil
 }
 
@@ -149,11 +143,6 @@ func (r *responseATC) setAtcResponseTooManyRequest() {
 
 func ValidateIsOneOfATCFromExternalSource(s string) bool {
 	return false
-}
-
-// get product data from variant ID
-func getNewProductDataVariant(req RequestFrontEndATC, i int64) product.ProductDataATC {
-	return product.ProductDataATC{}
 }
 
 func isEnableMultiValidateRestriction() bool { return false }

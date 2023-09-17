@@ -2,7 +2,7 @@ package newprovider
 
 import (
 	"fmt"
-	"hexagonal/domain/shop"
+	shop2 "hexagonal/domain/entities/shop"
 )
 
 type ShopResponse struct {
@@ -14,7 +14,7 @@ type ShopResponse struct {
 	Status   int32   `json:"status"`
 }
 
-func (repo *Repositories) GetShop(i shop.InputGetShop) (shop.ListShop, error) {
+func (repo *Repositories) GetShop(i shop2.InputGetShop) (shop2.ListShop, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp ShopResponse
@@ -22,6 +22,6 @@ func (repo *Repositories) GetShop(i shop.InputGetShop) (shop.ListShop, error) {
 	return resp.BuildToShop(), nil
 }
 
-func (r *ShopResponse) BuildToShop() shop.ListShop {
-	return shop.ListShop{}
+func (r *ShopResponse) BuildToShop() shop2.ListShop {
+	return shop2.ListShop{}
 }

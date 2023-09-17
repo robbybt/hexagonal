@@ -2,7 +2,7 @@ package newprovider
 
 import (
 	"fmt"
-	"hexagonal/domain/warehouse"
+	warehouse2 "hexagonal/domain/entities/warehouse"
 )
 
 type WarehouseResponse struct {
@@ -41,7 +41,7 @@ type WarehouseData struct {
 	GreaterCityName           string  `protobuf:"bytes,25,opt,name=GreaterCityName,proto3" json:"GreaterCityName,omitempty"`
 }
 
-func (repo *Repositories) GetWarehouseData(i warehouse.InputGetWarehouseData) ([]warehouse.WarehousePartnerData, error) {
+func (repo *Repositories) GetWarehouseData(i warehouse2.InputGetWarehouseData) ([]warehouse2.WarehousePartnerData, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp WarehouseResponse
@@ -49,6 +49,6 @@ func (repo *Repositories) GetWarehouseData(i warehouse.InputGetWarehouseData) ([
 	return resp.BuildToWarehousePartnerData(), nil
 }
 
-func (r *WarehouseResponse) BuildToWarehousePartnerData() []warehouse.WarehousePartnerData {
-	return []warehouse.WarehousePartnerData{}
+func (r *WarehouseResponse) BuildToWarehousePartnerData() []warehouse2.WarehousePartnerData {
+	return []warehouse2.WarehousePartnerData{}
 }

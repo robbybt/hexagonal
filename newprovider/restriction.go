@@ -2,7 +2,7 @@ package newprovider
 
 import (
 	"fmt"
-	"hexagonal/domain/restriction"
+	restriction2 "hexagonal/domain/entities/restriction"
 )
 
 type ValidateRestrictionResp struct {
@@ -32,7 +32,7 @@ type DataResponse struct {
 	IsError          bool   `protobuf:"varint,12,opt,name=is_error,json=isError,proto3" json:"is_error,omitempty"`
 }
 
-func (repo *Repositories) ValidateRestrictionCategory(i restriction.InputValidateRestrictionCategory) (restriction.ValidateRestrictionResponse, error) {
+func (repo *Repositories) ValidateRestrictionCategory(i restriction2.InputValidateRestrictionCategory) (restriction2.ValidateRestrictionResponse, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
 	var resp ValidateRestrictionResp
@@ -40,6 +40,6 @@ func (repo *Repositories) ValidateRestrictionCategory(i restriction.InputValidat
 	return resp.buildToValidateRestrictionResponse(), nil
 }
 
-func (r *ValidateRestrictionResp) buildToValidateRestrictionResponse() restriction.ValidateRestrictionResponse {
-	return restriction.ValidateRestrictionResponse{}
+func (r *ValidateRestrictionResp) buildToValidateRestrictionResponse() restriction2.ValidateRestrictionResponse {
+	return restriction2.ValidateRestrictionResponse{}
 }
