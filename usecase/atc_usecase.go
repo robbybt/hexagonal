@@ -11,22 +11,23 @@ import (
 	"hexagonal/lib/ctxlib"
 	"hexagonal/lib/ratelimiter"
 	"hexagonal/newprovider"
-	business2 "hexagonal/usecase/common/business"
+	"hexagonal/usecase/common/business"
+	"hexagonal/usecase/common/transaction/validation"
 )
 
 type UseCases struct {
 	Repos            newprovider.DomainRepository
-	Bmgm             business2.BMGMUsecaseInterface
-	CheckRestriction business2.CheckRestrictionUsecaseInterface
-	Owoc             business2.OWOCUsecaseInterface
+	Bmgm             business.BMGMUsecaseInterface
+	CheckRestriction business.CheckRestrictionUsecaseInterface
+	Owoc             business.OWOCUsecaseInterface
 }
 
 func NewUseCases(repos newprovider.DomainRepository) *UseCases {
 	return &UseCases{
 		Repos:            repos,
-		Bmgm:             business2.NewBMGMUseCases(repos),
-		CheckRestriction: business2.NewCheckRestrictionUseCases(repos),
-		Owoc:             business2.NewOWOCUseCases(repos),
+		Bmgm:             business.NewBMGMUseCases(repos),
+		CheckRestriction: business.NewCheckRestrictionUseCases(repos),
+		Owoc:             business.NewOWOCUseCases(repos),
 	}
 }
 
@@ -41,13 +42,13 @@ type responseATC struct {
 	ListShopID    []int
 }
 
-func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (responseATC, error) {
+func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (resp responseATC, err error) {
 	ctx, tSpan := ctxlib.SetupContextTracerUsecase(ctx)
 	defer tSpan.Finish()
 
-	resp := buildInitialAtcResponse(false)
+	resp.setInitialAtcResponse(false)
 
-	if r := validateInputAddProductToCart(ctx, req); len(r) > 0 {
+	if r := req.validateInputAddProductToCart(ctx); len(r) > 0 {
 		resp.setAtcResponseInputValidationError()
 		return resp, nil
 	}
@@ -97,7 +98,7 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 	}
 
 	// validate whether users do ATC from wishlist, last seen, recommendation list, or etc..
-	if ValidateIsOneOfATCFromExternalSource("cd.ATCFromExternalSource") {
+	if validation.ValidateIsOneOfATCFromExternalSource("cd.ATCFromExternalSource") {
 		// if product has variants; set a default variant for it
 		if prod.HaveVariant() {
 			// Change product data to product variant data
@@ -115,7 +116,7 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 		ListWarehouseID: listProdATC.ListWarehouse(),
 	})
 
-	if !isEnableMultiValidateRestriction() {
+	if !validation.IsEnableMultiValidateRestriction() {
 		uc.CheckRestriction.CheckRestrictedCategoryProduct(ctx, listProd)
 	} else {
 		uc.CheckRestriction.CheckRestrictedCategoryProduct(ctx, listProd)
@@ -125,24 +126,18 @@ func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (response
 	return responseATC{}, nil
 }
 
-func validateInputAddProductToCart(ctx context.Context, req RequestFrontEndATC) []string {
+func (req *RequestFrontEndATC) validateInputAddProductToCart(ctx context.Context) []string {
 	return []string{}
 }
 
-func buildInitialAtcResponse(isFromExternalEndpoint bool) responseATC {
-	return responseATC{}
+func (resp *responseATC) setInitialAtcResponse(isFromExternalEndpoint bool) {
+	resp.ListShopID = nil
 }
 
-func (r *responseATC) setAtcResponseInputValidationError() {
+func (resp *responseATC) setAtcResponseInputValidationError() {
 	// set response value
 }
 
-func (r *responseATC) setAtcResponseTooManyRequest() {
+func (resp *responseATC) setAtcResponseTooManyRequest() {
 	// set response value
 }
-
-func ValidateIsOneOfATCFromExternalSource(s string) bool {
-	return false
-}
-
-func isEnableMultiValidateRestriction() bool { return false }

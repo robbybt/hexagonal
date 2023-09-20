@@ -9,7 +9,7 @@ import (
 )
 
 type OWOCUsecaseInterface interface {
-	DoOWOC(ctx context.Context) error
+	DoOWOC(ctx context.Context, listProduct []product.Product, listShgp []shop.Shop) error
 }
 
 type OWOCUseCases struct {
