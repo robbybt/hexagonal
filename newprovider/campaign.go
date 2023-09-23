@@ -2,11 +2,11 @@ package newprovider
 
 import (
 	"fmt"
-	campaign2 "hexagonal/domain/entities/campaign"
+	"hexagonal/domain/entities/campaign"
 )
 
-type CampaignGRPC struct {
-	Products                  []*CmpPrdComplete `protobuf:"bytes,1,rep,name=products,proto3" json:"products,omitempty"`
+type campaignGRPC struct {
+	Products                  []*cmpPrdComplete `protobuf:"bytes,1,rep,name=products,proto3" json:"products,omitempty"`
 	TotalProduct              int64             `protobuf:"varint,2,opt,name=total_product,json=totalProduct,proto3" json:"total_product,omitempty"`
 	PaymentProfile            string            `protobuf:"bytes,3,opt,name=payment_profile,json=paymentProfile,proto3" json:"payment_profile,omitempty"`
 	DeductBsOnCanceledPayment bool              `protobuf:"varint,5,opt,name=deduct_bs_on_canceled_payment,json=deductBsOnCanceledPayment,proto3" json:"deduct_bs_on_canceled_payment,omitempty"`
@@ -18,7 +18,7 @@ type CampaignGRPC struct {
 	XXX_sizecache             int32             `json:"-"`
 }
 
-type CmpPrdComplete struct {
+type cmpPrdComplete struct {
 	ID                    int64    `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
 	Name                  string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	URL                   string   `protobuf:"bytes,3,opt,name=URL,proto3" json:"URL,omitempty"`
@@ -64,18 +64,19 @@ type CmpPrdComplete struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-type CampaignResponse struct {
-	CampaignGRPC
+type campaignResponse struct {
+	campaignGRPC
 }
 
-func (repo *Repositories) GetCampaign(i campaign2.InputGetCampaign) (campaign2.CampaignData, error) {
+func (repo *repositories) GetCampaign(i campaign.InputGetCampaign) (campaign.CampaignData, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
-	var resp CampaignResponse
+
+	var resp campaignResponse
 
 	return resp.BuildToCampaignData(), nil
 }
 
-func (r *CampaignResponse) BuildToCampaignData() campaign2.CampaignData {
-	return campaign2.CampaignData{}
+func (r *campaignResponse) BuildToCampaignData() campaign.CampaignData {
+	return campaign.CampaignData{}
 }

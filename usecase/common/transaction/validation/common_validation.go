@@ -1,3 +1,6 @@
 package validation
 
-func IsEnableMultiValidateRestriction() bool { return false }
+//
+func IsEnableMultiValidateRestriction() bool {
+	return false
+}

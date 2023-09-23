@@ -5,11 +5,7 @@ import (
 	"hexagonal/domain/entities/tokonow"
 )
 
-type InputGetTokonow struct {
-	CategoryID int
-}
-
-func (repo *Repositories) GetTokonowData(categoryID int) (tokonow.TokonowCategory, error) {
+func (repo *repositories) GetTokonowData(categoryID int) (tokonow.TokonowCategory, error) {
 	// restapicalls
 	fmt.Println("rest API with", categoryID)
 	var resp tokonow.TokonowCategory

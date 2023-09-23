@@ -32,7 +32,7 @@ Changelog
 - Interfacing 
   - usecase layer
   - common usecase layer
-  - domain logic ???
+  - domain logic ??? -> ok pake
 - Domain Layer
   - Redesign domain layer
     - design / create a new domain
@@ -44,17 +44,31 @@ Changelog
     - usecase -> contains usecase / business about the domain only.
     - repository -> Interface and all related provider / repository 
   - Categorizing / grouping domain
-    - aggregates
+    - composite
       - all domain that contains embed for domain
     - entities
 - usecase layer
   - streamline logic by wraping all logic non usecase to func and move it other package like (ctx, monitoring, etc )
   - reordering flow ( validate first instead getting data )
   - no builder logic on usecase
-  - shared repository / single repository ???
+  - shared repository / single repository ??? -> single repository
 - usecase common layer
   - Categorizing by ??? by identify and make sure for single responsibility
-  - shared repository / single repository ???
+  - shared repository / single repository ??? -> single repository
+  - transaction
+    - up to you use interface or not
+      - if simple no need interface
+  - business
+    - should interface
+    - isolated only for business logic
+- repository layer
+  - direct domain struct ??? ->  builder
 - others
   - Comment
   - Public / private
+
+Phase implementation
+- endpoint
+  - divide into some part of endpoint
+- reduce the impact
+  - rollout from the minimum rps of feature

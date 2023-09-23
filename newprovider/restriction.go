@@ -2,27 +2,27 @@ package newprovider
 
 import (
 	"fmt"
-	restriction2 "hexagonal/domain/entities/restriction"
+	"hexagonal/domain/entities/restriction"
 )
 
-type ValidateRestrictionResp struct {
-	ValidateRestrictionResponse
+type validateRestrictionResp struct {
+	validateRestrictionResponse
 }
 
-type ValidateRestrictionResponse struct {
+type validateRestrictionResponse struct {
 	Success      bool            `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Message      string          `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	DataResponse []*DataResponse `protobuf:"bytes,3,rep,name=data_response,json=dataResponse,proto3" json:"data_response,omitempty"`
-	MetaResponse []*MetaResponse `protobuf:"bytes,4,rep,name=meta_response,json=metaResponse,proto3" json:"meta_response,omitempty"`
+	DataResponse []*dataResponse `protobuf:"bytes,3,rep,name=data_response,json=dataResponse,proto3" json:"data_response,omitempty"`
+	MetaResponse []*metaResponse `protobuf:"bytes,4,rep,name=meta_response,json=metaResponse,proto3" json:"meta_response,omitempty"`
 }
 
-type MetaResponse struct {
+type metaResponse struct {
 	RestrictionName string          `protobuf:"bytes,1,opt,name=restriction_name,json=restrictionName,proto3" json:"restriction_name,omitempty"`
-	DataResponse    []*DataResponse `protobuf:"bytes,2,rep,name=data_response,json=dataResponse,proto3" json:"data_response,omitempty"`
+	DataResponse    []*dataResponse `protobuf:"bytes,2,rep,name=data_response,json=dataResponse,proto3" json:"data_response,omitempty"`
 	ErrorMessage    []string        `protobuf:"bytes,3,rep,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
 }
 
-type DataResponse struct {
+type dataResponse struct {
 	ProductId        int64  `protobuf:"varint,1,opt,name=product_id,json=productId,proto3" json:"product_id,omitempty"`
 	Status           string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 	ShopId           int64  `protobuf:"varint,4,opt,name=shop_id,json=shopId,proto3" json:"shop_id,omitempty"`
@@ -32,14 +32,14 @@ type DataResponse struct {
 	IsError          bool   `protobuf:"varint,12,opt,name=is_error,json=isError,proto3" json:"is_error,omitempty"`
 }
 
-func (repo *Repositories) ValidateRestrictionCategory(i restriction2.InputValidateRestrictionCategory) (restriction2.ValidateRestrictionResponse, error) {
+func (repo *repositories) ValidateRestrictionCategory(i restriction.InputValidateRestrictionCategory) (restriction.ValidateRestrictionResponse, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
-	var resp ValidateRestrictionResp
+	var resp validateRestrictionResp
 
 	return resp.buildToValidateRestrictionResponse(), nil
 }
 
-func (r *ValidateRestrictionResp) buildToValidateRestrictionResponse() restriction2.ValidateRestrictionResponse {
-	return restriction2.ValidateRestrictionResponse{}
+func (r *validateRestrictionResp) buildToValidateRestrictionResponse() restriction.ValidateRestrictionResponse {
+	return restriction.ValidateRestrictionResponse{}
 }

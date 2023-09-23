@@ -4,140 +4,116 @@ import (
 	"context"
 	"fmt"
 	"hexagonal/domain/entities/campaign"
+	"hexagonal/domain/entities/cart"
 	"hexagonal/domain/entities/ims"
 	"hexagonal/domain/entities/product"
+	"hexagonal/domain/entities/restriction"
 	"hexagonal/domain/entities/shop"
+	"hexagonal/domain/entities/tokonow"
 	"hexagonal/domain/entities/warehouse"
 	"hexagonal/lib/ctxlib"
 	"hexagonal/lib/ratelimiter"
-	"hexagonal/newprovider"
 	"hexagonal/usecase/common/business"
+	"hexagonal/usecase/common/transaction/collector"
 	"hexagonal/usecase/common/transaction/validation"
 )
 
-type UseCases struct {
-	Repos            newprovider.DomainRepository
-	Bmgm             business.BMGMUsecaseInterface
-	CheckRestriction business.CheckRestrictionUsecaseInterface
-	Owoc             business.OWOCUsecaseInterface
+type AtcUsecaseInterface interface {
+	DoAtc(ctx context.Context, req RequestFrontEndATC) (resp ResponseATC, err error)
 }
 
-func NewUseCases(repos newprovider.DomainRepository) *UseCases {
-	return &UseCases{
-		Repos:            repos,
-		Bmgm:             business.NewBMGMUseCases(repos),
-		CheckRestriction: business.NewCheckRestrictionUseCases(repos),
-		Owoc:             business.NewOWOCUseCases(repos),
+type atcRepository struct {
+	productRepository     product.ProductRepository
+	shopRepository        shop.ShopRepository
+	imsRepository         ims.ImsRepository
+	campaignRepository    campaign.CampaignRepository
+	cartRepository        cart.CartRepository
+	warehouseRepository   warehouse.WarehouseRepository
+	tokonowRepository     tokonow.TokonowRepository
+	restrictionRepository restriction.RestrictionRepository
+}
+
+type atcUsecase struct {
+	atcRepository
+	bmgm             business.BMGMUsecaseInterface
+	checkrestriction business.CheckRestrictionUsecaseInterface
+	owoc             business.OWOCUsecaseInterface
+	collectorATC     collector.CollectorATCUsecaseInterface
+}
+
+func NewAtcUsecase(repository atcRepository) AtcUsecaseInterface {
+	// init common business
+	bmgm := business.NewBMGMUseCases(business.BmgmRepository{
+		CampaignRepos: repository.campaignRepository,
+	})
+	checkrestriction := business.NewCheckRestrictionUseCases(business.CheckRestrictionRepository{
+		TokonowRepo:     repository.tokonowRepository,
+		RestrictionRepo: repository.restrictionRepository,
+	})
+	owoc := business.NewOWOCUseCases(business.OwocRepository{
+		Tokonow: repository.tokonowRepository,
+	})
+	collectorATC := collector.NewCollectorATCUseCases(collector.CollectorATCRepository{
+		ProductRepository:  repository.productRepository,
+		ShopRepository:     repository.shopRepository,
+		ImsRepository:      repository.imsRepository,
+		CampaignRepository: repository.campaignRepository,
+	})
+	return &atcUsecase{
+		atcRepository:    repository,
+		bmgm:             bmgm,
+		checkrestriction: checkrestriction,
+		owoc:             owoc,
+		collectorATC:     collectorATC,
 	}
 }
 
-type RequestFrontEndATC struct {
-	productID int
-	qty       int
-	shopID    int
-}
-
-type responseATC struct {
-	ListProductID []int
-	ListShopID    []int
-}
-
-func (uc *UseCases) DoAtc(ctx context.Context, req RequestFrontEndATC) (resp responseATC, err error) {
+func (uc *atcUsecase) DoAtc(ctx context.Context, req RequestFrontEndATC) (resp ResponseATC, err error) {
 	ctx, tSpan := ctxlib.SetupContextTracerUsecase(ctx)
 	defer tSpan.Finish()
 
-	resp.setInitialAtcResponse(false)
+	resp.setInitialResponse(false)
 
-	if r := req.validateInputAddProductToCart(ctx); len(r) > 0 {
-		resp.setAtcResponseInputValidationError()
-		return resp, nil
+	if r := req.validateInput(ctx); len(r) > 0 {
+		resp.setResponseInputValidationError()
+		return resp, fmt.Errorf("error")
 	}
 
-	listProdATC, err := uc.Repos.GetProductATC(product.InputGetProductATC{
-		ListProductID: []int{req.productID},
-	})
+	listProdATC, listShop, imsData, cmp, err := uc.collectorATC.FetchDataListProduct([]int{req.productID}, []int{req.shopID})
 	if err != nil {
-		return resp, err
-	}
-	prod := listProdATC.List[0]
-	listProd := listProdATC.ListofProduct()
-
-	listShop, err := uc.Repos.GetShop(shop.InputGetShop{
-		ListShopID: []int{req.shopID},
-	})
-	if err != nil {
-		return resp, err
-	}
-	mapShop := listShop.Map()
-	fmt.Println(mapShop)
-
-	imsData, err := uc.Repos.GetNearestWarehouse(ims.InputGetNearestWarehouse{
-		ListProductID: []int{req.productID},
-	})
-	if err != nil {
+		fmt.Println(err.Error())
 		return resp, err
 	}
 
-	// GetCampaign need ims data so need to be called after get ims data
-	cmp, err := uc.Repos.GetCampaign(campaign.InputGetCampaign{
-		WarehouseData: imsData,
-		ListProductID: []int{req.productID},
-	})
-	if err != nil {
-		return resp, err
-	}
-
-	// set campign data to product
-	// set ims data to product
 	if ratelimiter.CheckRequest(ctx, ratelimiter.ATCSource, func(ctx context.Context, param ratelimiter.LimiterCheckParam) (ratelimiter.LimiterCheckResult, error) {
 		return ratelimiter.LimiterCheckResult{}, nil
 	}) {
-		resp.setAtcResponseTooManyRequest()
+		resp.setResponseTooManyRequest()
 		fmt.Println("kena ratelimiter")
-		return resp, nil
+		return resp, fmt.Errorf("error")
 	}
 
 	// validate whether users do ATC from wishlist, last seen, recommendation list, or etc..
+	listProd := listProdATC.ListofProduct()
+	prod := listProd.List[0]
 	if validation.ValidateIsOneOfATCFromExternalSource("cd.ATCFromExternalSource") {
-		// if product has variants; set a default variant for it
 		if prod.HaveVariant() {
 			// Change product data to product variant data
 			prod = prod.GetProductVariant()
 		}
 		req.qty = prod.GetMinimumOrder()
-		/*
-			if IsFromATCExternalEndpoint(cd.ATCFromExternalSource) {
-				cd.ShopID = productData.ShopID
-			}
-		*/
 	}
 
-	ListWarehouseData, err := uc.Repos.GetWarehouseData(warehouse.InputGetWarehouseData{
-		ListWarehouseID: listProdATC.ListWarehouse(),
+	ListWarehouseData, err := uc.warehouseRepository.GetWarehouseData(warehouse.InputGetWarehouseData{
+		ListWarehouseID: listProd.ListWarehouseID(),
 	})
 
 	if !validation.IsEnableMultiValidateRestriction() {
-		uc.CheckRestriction.CheckRestrictedCategoryProduct(ctx, listProd)
+		uc.checkrestriction.CheckRestrictedCategoryProduct(ctx, listProd.List)
 	} else {
-		uc.CheckRestriction.CheckRestrictedCategoryProduct(ctx, listProd)
+		uc.checkrestriction.CheckRestrictedCategoryProduct(ctx, listProd.List)
 	}
 
-	fmt.Println(listProd, listShop, cmp, ListWarehouseData)
-	return responseATC{}, nil
-}
-
-func (req *RequestFrontEndATC) validateInputAddProductToCart(ctx context.Context) []string {
-	return []string{}
-}
-
-func (resp *responseATC) setInitialAtcResponse(isFromExternalEndpoint bool) {
-	resp.ListShopID = nil
-}
-
-func (resp *responseATC) setAtcResponseInputValidationError() {
-	// set response value
-}
-
-func (resp *responseATC) setAtcResponseTooManyRequest() {
-	// set response value
+	fmt.Println(listProd, listShop, cmp, imsData, ListWarehouseData)
+	return ResponseATC{}, nil
 }

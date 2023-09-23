@@ -5,7 +5,6 @@ import (
 	"hexagonal/domain/entities/product"
 	"hexagonal/domain/entities/restriction"
 	"hexagonal/domain/entities/tokonow"
-	"hexagonal/newprovider"
 )
 
 type CheckRestrictionUsecaseInterface interface {
@@ -16,20 +15,21 @@ type CheckRestrictionUsecaseInterface interface {
 	CheckStatusFSLocationRestriction() string
 }
 
-type CheckRestrictionUseCases struct {
+type CheckRestrictionRepository struct {
 	TokonowRepo     tokonow.TokonowRepository
 	RestrictionRepo restriction.RestrictionRepository
 }
 
-func NewCheckRestrictionUseCases(repos newprovider.DomainRepository) *CheckRestrictionUseCases {
-	return &CheckRestrictionUseCases{
-		TokonowRepo:     repos,
-		RestrictionRepo: repos,
-	}
+type checkRestrictionUseCases struct {
+	CheckRestrictionRepository
+}
+
+func NewCheckRestrictionUseCases(repos CheckRestrictionRepository) CheckRestrictionUsecaseInterface {
+	return &checkRestrictionUseCases{repos}
 }
 
 // CheckRestrictedCategoryProduct will return validation message according to category
-func (uc *CheckRestrictionUseCases) CheckRestrictedCategoryProduct(ctx context.Context, listProd []product.Product) (validationMessage string) {
+func (uc *checkRestrictionUseCases) CheckRestrictedCategoryProduct(ctx context.Context, listProd []product.Product) (validationMessage string) {
 	var reqRestriction restriction.InputValidateRestrictionCategory
 	for _, p := range listProd {
 		tokonow, err := uc.TokonowRepo.GetTokonowData(p.CategoryID)
@@ -47,24 +47,24 @@ func (uc *CheckRestrictionUseCases) CheckRestrictedCategoryProduct(ctx context.C
 }
 
 // CheckRestrictedProductForShopFollower will return validation message according to category
-func (uc *CheckRestrictionUseCases) CheckRestrictedProductForShopFollower() {
+func (uc *checkRestrictionUseCases) CheckRestrictedProductForShopFollower() {
 	// TODO implement me
 	panic("implement me")
 }
 
 // CheckRestrictedProductForLoyaltyDays will return validation message according to category
-func (uc *CheckRestrictionUseCases) CheckRestrictedProductForLoyaltyDays() {
+func (uc *checkRestrictionUseCases) CheckRestrictedProductForLoyaltyDays() {
 	// TODO implement me
 	panic("implement me")
 }
 
 // MultiValidateRestriction will return validation message according to category
-func (uc *CheckRestrictionUseCases) MultiValidateRestriction() {
+func (uc *checkRestrictionUseCases) MultiValidateRestriction() {
 	// TODO implement me
 	panic("implement me")
 }
 
 // CheckStatusFSLocationRestriction will check all status location
-func (uc *CheckRestrictionUseCases) CheckStatusFSLocationRestriction() string {
+func (uc *checkRestrictionUseCases) CheckStatusFSLocationRestriction() string {
 	return ""
 }

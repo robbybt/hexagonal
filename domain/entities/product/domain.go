@@ -12,6 +12,14 @@ const (
 	ProductStateBanned    = -2
 )
 
+type ListProduct struct {
+	List []Product
+}
+
+type MapProduct struct {
+	Map map[int64]Product
+}
+
 type Product struct {
 	ProductName      string
 	ProductAlias     string
@@ -19,7 +27,7 @@ type Product struct {
 	ParentID         int64
 	CategoryID       int
 	ParentName       string
-	Variant          productVariant
+	Variant          ProductVariant
 	SKU              string
 	ShopID           int64
 	SellerID         int64
@@ -38,9 +46,22 @@ type ProductWarehouse struct {
 	ProductInvenageValue  int32
 }
 
-type productVariant struct {
+type ProductVariant struct {
 	ParentID   int64
 	IsParent   bool
 	IsVariant  bool
 	ChildrenID []int64
+}
+
+func (list *ListProduct) MapProductID() MapProduct {
+	return MapProduct{}
+}
+
+func (list *ListProduct) ListWarehouseID() (listWarehouseID []int) {
+	return listWarehouseID
+}
+
+// GetProductVariant will return product data from variant id
+func (list *Product) GetProductVariant() Product {
+	return Product{}
 }

@@ -6,7 +6,7 @@ import (
 	"hexagonal/domain/entities/cart"
 )
 
-type CartResponse struct {
+type cartResponse struct {
 	CartID            int64  `json:"cart_id"`
 	ProductID         int64  `json:"product_id"`
 	Quantity          int32  `json:"quantity"`
@@ -22,14 +22,14 @@ type CartResponse struct {
 	BundleQuantity    int64  `json:"bundle_quantity"`
 }
 
-func (repo *Repositories) GetCartDetailByUserCartStatuses(ctx context.Context, userIDs []int64, statuses []int, isAllowBundle bool) ([]cart.Cart, error) {
+func (repo *repositories) GetCartDetailByUserCartStatuses(ctx context.Context, userIDs []int64, statuses []int, isAllowBundle bool) ([]cart.Cart, error) {
 	// restapicalls
 	fmt.Println("rest API with", ctx)
-	var resp CartResponse
+	var resp cartResponse
 
 	return resp.BuildToCart(), nil
 }
 
-func (r *CartResponse) BuildToCart() []cart.Cart {
+func (r *cartResponse) BuildToCart() []cart.Cart {
 	return []cart.Cart{}
 }

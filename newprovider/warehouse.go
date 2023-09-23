@@ -2,18 +2,19 @@ package newprovider
 
 import (
 	"fmt"
+	"hexagonal/domain/entities/warehouse"
 	warehouse2 "hexagonal/domain/entities/warehouse"
 )
 
-type WarehouseResponse struct {
-	WarehouseDataResponse
+type warehouseResponse struct {
+	warehouseDataResponse
 }
 
-type WarehouseDataResponse struct {
-	Warehouses []*WarehouseData `protobuf:"bytes,1,rep,name=Warehouses,proto3" json:"Warehouses,omitempty"`
+type warehouseDataResponse struct {
+	Warehouses []*warehouseData `protobuf:"bytes,1,rep,name=Warehouses,proto3" json:"Warehouses,omitempty"`
 }
 
-type WarehouseData struct {
+type warehouseData struct {
 	WarehouseID               int64   `protobuf:"varint,1,opt,name=WarehouseID,proto3" json:"WarehouseID,omitempty"`
 	PartnerID                 int     `protobuf:"bytes,2,opt,name=PartnerID,proto3" json:"PartnerID,omitempty"`
 	ShopID                    int     `protobuf:"bytes,3,opt,name=ShopID,proto3" json:"ShopID,omitempty"`
@@ -41,14 +42,14 @@ type WarehouseData struct {
 	GreaterCityName           string  `protobuf:"bytes,25,opt,name=GreaterCityName,proto3" json:"GreaterCityName,omitempty"`
 }
 
-func (repo *Repositories) GetWarehouseData(i warehouse2.InputGetWarehouseData) ([]warehouse2.WarehousePartnerData, error) {
+func (repo *repositories) GetWarehouseData(i warehouse.InputGetWarehouseData) ([]warehouse.WarehousePartnerData, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
-	var resp WarehouseResponse
+	var resp warehouseResponse
 
 	return resp.BuildToWarehousePartnerData(), nil
 }
 
-func (r *WarehouseResponse) BuildToWarehousePartnerData() []warehouse2.WarehousePartnerData {
+func (r *warehouseResponse) BuildToWarehousePartnerData() []warehouse.WarehousePartnerData {
 	return []warehouse2.WarehousePartnerData{}
 }

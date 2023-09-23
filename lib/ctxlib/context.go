@@ -12,6 +12,7 @@ func (t *TraceSpan) Finish() {
 	return
 }
 
+// SetupContextTracerUsecase will inject context with tracer new relic for tracing
 func SetupContextTracerUsecase(ctx context.Context) (context.Context, *TraceSpan) {
 	/*
 		ctx = logv2.InitFuncContext(ctx)

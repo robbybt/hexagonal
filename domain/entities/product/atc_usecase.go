@@ -4,6 +4,10 @@ type ListProductATC struct {
 	List []ProductDataATC
 }
 
+type MapProductATC struct {
+	Map map[int64]ProductDataATC
+}
+
 type ProductDataATC struct {
 	Product
 
@@ -11,19 +15,14 @@ type ProductDataATC struct {
 	Volumetric    string
 }
 
-func (p *ListProductATC) MapofProductID() map[int64]Product {
-	return map[int64]Product{}
+func (list ListProductATC) MapProductID() MapProductATC {
+	return MapProductATC{}
 }
 
-func (p *ListProductATC) ListofProduct() []Product {
-	return []Product{}
+func (p *ListProductATC) ListofProduct() ListProduct {
+	return ListProduct{}
 }
 
-func (p *ListProductATC) ListWarehouse() []int {
-	return []int{}
-}
-
-// GetProductVariant will return product data from variant ID
-func (p *ProductDataATC) GetProductVariant() ProductDataATC {
-	return ProductDataATC{}
+func (p *MapProductATC) ListofProduct() MapProduct {
+	return MapProduct{}
 }

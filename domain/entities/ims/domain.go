@@ -25,6 +25,7 @@ type ProductWarehouse struct {
 	ShopID             int64
 	UnavailableReason  int32
 	OriginWarehouseID  int64
+	asd                string
 }
 
 type BundleInfoWarehouse struct {

@@ -2,10 +2,11 @@ package newprovider
 
 import (
 	"fmt"
+	"hexagonal/domain/entities/ims"
 	ims2 "hexagonal/domain/entities/ims"
 )
 
-type ImsGRPC struct {
+type imsGRPC struct {
 	ProductID          int64   `protobuf:"varint,1,opt,name=productID,proto3" json:"productID,omitempty"`
 	Stock              int64   `protobuf:"varint,2,opt,name=stock,proto3" json:"stock,omitempty"`
 	StockWording       string  `protobuf:"bytes,3,opt,name=stockWording,proto3" json:"stockWording,omitempty"`
@@ -15,18 +16,19 @@ type ImsGRPC struct {
 	OriginalStock      int64   `protobuf:"varint,10,opt,name=originalStock,proto3" json:"originalStock,omitempty"`
 }
 
-type ImsResponse struct {
-	ImsGRPC
+type imsResponse struct {
+	imsGRPC
 }
 
-func (repo *Repositories) GetNearestWarehouse(i ims2.InputGetNearestWarehouse) (ims2.ProductsWarehouseData, error) {
+func (repo *repositories) GetNearestWarehouse(i ims.InputGetNearestWarehouse) (ims.ProductsWarehouseData, error) {
 	// restapicalls
 	fmt.Println("rest API with", i)
-	var resp ImsResponse
+	var resp imsResponse
 
 	return resp.BuildToProductsWarehouseData(), nil
 }
 
-func (r *ImsResponse) BuildToProductsWarehouseData() ims2.ProductsWarehouseData {
+func (r *imsResponse) BuildToProductsWarehouseData() ims.ProductsWarehouseData {
+	// asd <- response
 	return ims2.ProductsWarehouseData{}
 }
